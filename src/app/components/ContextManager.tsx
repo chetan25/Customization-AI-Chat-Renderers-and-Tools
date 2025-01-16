@@ -5,7 +5,7 @@ import React, { useState, useCallback, createContext, useContext } from "react";
 type ContextData = {
   id: string;
   type: "document" | "database" | "api" | "custom";
-  content: string;
+  content: string | Record<string, any>;
   metadata?: Record<string, any>;
 };
 
@@ -53,7 +53,7 @@ export const ContextProvider = ({
 };
 
 // Custom hook for context management
-export const useContextData = () => {
+export const useContextData = (): ChatContextType => {
   const context = useContext(ChatContext);
   if (!context)
     throw new Error("useContextData must be used within ContextProvider");

@@ -17,6 +17,7 @@ import {
 export const Chart = ({ content }: { content: any }) => {
   // Parse the content to extract chart data and type
   const parseChartContent = (content: any) => {
+    console.log({ content });
     try {
       return {
         type: content.type,

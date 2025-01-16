@@ -14,6 +14,7 @@ type AIConfig = {
     pattern: RegExp;
     component: string;
   }>;
+  dynamicContextId?: string;
 };
 
 // Custom message renderer that handles special components
@@ -25,6 +26,7 @@ const MessageRenderer = ({
   if (typeof content === "object") {
     // Check content against render rules
     for (const rule of renderRules!) {
+      console.log(content.responseType, rule.component.toLowerCase());
       if (content.responseType === rule.component.toLowerCase()) {
         const Component = components![rule.component];
         if (Component) {
@@ -46,12 +48,14 @@ const ConfigurableAIChat = ({
   systemPrompt,
   components,
   renderRules,
+  dynamicContextId,
 }: AIConfig) => {
   //   const [showConfig, setShowConfig] = useState(false);
 
   const { messages, isLoading, error, sendMessage } = useChat({
     context,
     systemPrompt,
+    dynamicContextId,
   });
 
   const handleSubmit = useCallback(

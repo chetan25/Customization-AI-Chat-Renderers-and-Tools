@@ -48,18 +48,20 @@ export type ChatMessage = {
 
 export type ChatRequest = {
   messages: ChatMessage[];
-  context?: string;
+  staticContext?: string;
+  dynamicContext?: string;
   systemPrompt?: string;
 };
 
 export async function POST(req: Request) {
   try {
-    const { messages } = await req.json();
+    const { messages, dynamicContext } = await req.json();
     console.log({ messages });
     // Get the last user message
     const lastMessage = messages[messages.length - 1];
     const userMessage = lastMessage.content.toLowerCase();
 
+    console.log({ dynamicContext });
     // Determine which response to send
     let responseContent;
     if (userMessage.includes("chart")) {
@@ -67,7 +69,11 @@ export async function POST(req: Request) {
     } else if (userMessage.includes("table")) {
       responseContent = MOCK_RESPONSES.table;
     } else {
-      responseContent = MOCK_RESPONSES.greeting;
+      if (dynamicContext.length > 2 && userMessage.includes("bar")) {
+        responseContent = JSON.parse(dynamicContext)["content"];
+      } else {
+        responseContent = MOCK_RESPONSES.greeting;
+      }
     }
 
     // Simulate API delay

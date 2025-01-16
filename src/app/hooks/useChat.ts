@@ -1,14 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useCallback } from "react";
-import { ChatMessage, ChatRequest } from "../api/chat/route";
+import { ChatMessage, ChatRequest } from "@/app/api/chat/route";
+import { useContextData } from "@/app/components/ContextManager";
 
 export const useChat = (config: {
   context?: string;
   systemPrompt?: string;
+  dynamicContextId?: string;
 }) => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const { dynamicContext } = useContextData();
 
   const sendMessage = useCallback(
     async (content: string) => {
@@ -23,11 +27,19 @@ export const useChat = (config: {
         };
 
         setMessages((prev) => [...prev, userMessage]);
+        let dyContext: (typeof dynamicContext)[number] | string = "";
+        if (config.dynamicContextId) {
+          dyContext =
+            dynamicContext.find((ctx) => ctx.id === config.dynamicContextId) ||
+            "";
+        }
 
+        dyContext = JSON.stringify(dyContext);
         // Prepare request
         const chatRequest: ChatRequest = {
           messages: [...messages, userMessage],
-          context: config.context,
+          staticContext: config.context,
+          dynamicContext: dyContext,
           systemPrompt: config.systemPrompt,
         };
 
